@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧠 Mind Games Collection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #f0f0ff);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1, h2 {
+      color: #004d66;
+    }
+    .game-list button {
+      padding: 12px 24px;
+      margin: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #0077cc;
+      color: white;
+    }
+    .btn-group button {
+      font-size: 1rem;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+    .yes { background-color: #28a745; }
+    .no { background-color: #dc3545; }
+    .back-btn {
+      margin-top: 20px;
+      background-color: #666;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .emoji { font-size: 2rem; margin: 10px 0; }
+    .pattern-button {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #patternBoard {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 300px;
+      margin: auto;
+    }
+    input {
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Welcome to Mind Games</h1>
+  <div id="home" class="game-list">
+    <button onclick="loadGame('mindReader')">Mind Reader</button>
+    <button onclick="loadGame('emojiPuzzle')">Emoji Puzzle</button>
+    <button onclick="loadGame('memoryPattern')">Memory Pattern</button>
+  </div>
+
+  <div id="gameArea" class="game-container"></div>
+
+  <script>
+    function loadGame(game) {
+      document.getElementById("home").style.display = "none";
+      const gameArea = document.getElementById("gameArea");
+
+      if (game === "mindReader") {
+        gameArea.innerHTML = `
+          <h2>🤯 Mind Reader (1–100)</h2>
+          <p>Think of a number between 1 and 100. I will ask 7 questions.</p>
+          <div id="question"></div>
+          <div id="numbers" style="white-space: pre-wrap; padding: 10px; background: #fff; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+          <div class="btn-group">
+            <button class="yes" onclick="handleAnswer(true)">Yes</button>
+            <button class="no" onclick="handleAnswer(false)">No</button>
+          </div>
+          <div id="result"></div>
+          <button class="back-btn" onclick="goBack()">⬅️ Back</button>
+        `;
+        const sets = [];
+        for (let bit = 0; bit < 7; bit++) {
+          const currentSet = [];
+          for (let i = 1; i <= 100; i++) {
+            if ((i >> bit) & 1) currentSet.push(i);
+          }
+          sets.push(currentSet);
+        }
+        let currentQuestion = 0;
+        let guessedNumber = 0;
+        const questionDiv = document.getElementById("question");
+        const numbersDiv = document.getElementById("numbers");
+        const resultDiv = document.getElementById("result");
+
+        function showQuestion() {
+          if (currentQuestion < sets.length) {
+            questionDiv.innerText = `Q${currentQuestion + 1}: Is your number in this list?`;
+            numbersDiv.innerText = sets[currentQuestion].join(', ');
+          } else {
+            showResult();
+          }
+        }
+
+        window.handleAnswer = function(isYes) {
+          if (isYes) guessedNumber += 2 ** currentQuestion;
+          currentQuestion++;
+          showQuestion();
+        };
+
+        function showResult() {
+          questionDiv.style.display = 'none';
+          numbersDiv.style.display = 'none';
+          document.querySelector('.btn-group').style.display = 'none';
+          resultDiv.innerHTML = `🎉 Your number is: <span style="color: #28a745">${guessedNumber}</span>`;
+        }
+
+        showQuestion();
+      }
+
+      if (game === "emojiPuzzle") {
+  const emojiTemplates = [
+    {
+      clue: () => `${random(["🍕", "🍔", "🍟"])}❤️`,
+      answer: () => `i love ${random(["pizza", "burger", "fries"])}`
+    },
+    {
+      clue: () => `${random(["🐶", "🐱", "🐰"])}👑`,
+      answer: () => `${random(["dog", "cat", "rabbit"])} king`
+    },
+    {
+      clue: () => `${random(["🎮", "🕹️"])}🎉`,
+      answer: () => `game party`
+    },
+    {
+      clue: () => `${random(["🎓", "📚"])}🚀`,
+      answer: () => `study hard`
+    },
+    {
+      clue: () => `${random(["🎅", "🎄"])}🎁`,
+      answer: () => `christmas gift`
+    },
+    {
+      clue: () => `${random(["💔", "😭"])}💬`,
+      answer: () => `sad message`
+    },
+    {
+      clue: () => `${random(["💡", "🧠"])}✨`,
+      answer: () => `smart idea`
+    },
+    {
+      clue: () => `${random(["🌧️", "⛈️", "☔"])}🏠`,
+      answer: () => `rainy day at home`
+    },
+    {
+      clue: () => `${random(["🍜", "🍛", "🥘"])}🔥`,
+      answer: () => `hot food`
+    },
+    {
+      clue: () => `${random(["🚀", "🛸"])}🌌`,
+      answer: () => `space travel`
+    }
+  ];
+
+  function random(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function generatePuzzles(count = 10) {
+    const usedIndexes = new Set();
+    const puzzles = [];
+
+    while (puzzles.length < count) {
+      const idx = Math.floor(Math.random() * emojiTemplates.length);
+      if (!usedIndexes.has(idx)) {
+        usedIndexes.add(idx);
+        const template = emojiTemplates[idx];
+        puzzles.push({
+          clue: template.clue(),
+          answer: template.answer()
+        });
+      }
+    }
+
+    return puzzles;
+  }
+
+  const allPuzzles = generatePuzzles(10);
+  let score = 0;
+  let round = 0;
+  let currentAnswer = "";
+
+  function showFinalResult() {
+    const result =
+      score >= 9 ? "🎉 You are a Master!" :
+      score >= 5 ? "👍 Very Well Done!" :
+      "😅 Better Luck Next Time!";
+
+    document.getElementById("gameArea").innerHTML = `
+      <h2>🏁 Game Over</h2>
+      <p>You got <strong>${score}/${round}</strong></p>
+      <h3>${result}</h3>
+      <button class="back-btn" onclick="goBack()">⬅️ Back to Menu</button>
+    `;
+  }
+
+  function loadNextPuzzle() {
+    if (round >= 10) {
+      showFinalResult();
+      return;
+    }
+
+    const current = allPuzzles[round];
+    currentAnswer = current.answer.toLowerCase();
+    round++;
+
+    document.getElementById("gameArea").innerHTML = `
+      <h2>🧩 Emoji Puzzle (${round}/10)</h2>
+      <div class="emoji">${current.clue}</div>
+      <input id="emojiInput" placeholder="Your answer..." />
+      <button onclick="checkEmoji()">Submit</button>
+      <button class="back-btn" onclick="stopGame()">🛑 Stop</button>
+      <div id="emojiResult"></div>
+    `;
+  }
+
+  window.checkEmoji = function () {
+    const input = document.getElementById("emojiInput").value.trim().toLowerCase();
+    const resultDiv = document.getElementById("emojiResult");
+
+    if (input === currentAnswer) {
+      score++;
+      resultDiv.innerHTML = "✅ Correct!";
+      setTimeout(loadNextPuzzle, 1000);
+    } else {
+      resultDiv.innerHTML = `❌ Wrong! Correct Answer: <strong>${currentAnswer}</strong>`;
+      setTimeout(loadNextPuzzle, 1500);
+    }
+  };
+
+  window.stopGame = function () {
+    showFinalResult();
+  };
+
+  loadNextPuzzle();
+}
+
+
+      if (game === "memoryPattern") {
+        const colors = ["red", "green", "blue", "yellow"];
+        let sequence = [];
+        let userStep = 0;
+
+        gameArea.innerHTML = `
+          <h2>🔁 Memory Pattern</h2>
+          <p>Watch the sequence and repeat it!</p>
+          <div id="patternBoard"></div>
+          <button onclick="startPattern()">Start</button>
+          <div id="patternResult"></div>
+          <button class="back-btn" onclick="goBack()">⬅️ Back</button>
+        `;
+
+        function showButtons() {
+          const board = document.getElementById("patternBoard");
+          board.innerHTML = "";
+          colors.forEach(color => {
+            const btn = document.createElement("button");
+            btn.className = "pattern-button";
+            btn.style.backgroundColor = color;
+            btn.onclick = () => handleUserClick(color);
+            board.appendChild(btn);
+          });
+        }
+
+        window.startPattern = function() {
+          sequence = [];
+          userStep = 0;
+          document.getElementById("patternResult").innerText = "";
+          for (let i = 0; i < 3; i++) {
+            sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+          }
+          showButtons();
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i < sequence.length) {
+              const color = sequence[i];
+              const btns = document.querySelectorAll(".pattern-button");
+              btns.forEach(btn => {
+                if (btn.style.backgroundColor === color) {
+                  btn.style.opacity = "0.3";
+                  setTimeout(() => btn.style.opacity = "1", 500);
+                }
+              });
+              i++;
+            } else {
+              clearInterval(interval);
+            }
+          }, 800);
+        };
+
+        window.handleUserClick = function(color) {
+          if (color === sequence[userStep]) {
+            userStep++;
+            if (userStep === sequence.length) {
+              document.getElementById("patternResult").innerText = "🎉 Well done!";
+            }
+          } else {
+            document.getElementById("patternResult").innerText = "❌ Wrong pattern!";
+            userStep = 0;
+          }
+        };
+      }
+    }
+
+    function goBack() {
+      document.getElementById("gameArea").innerHTML = "";
+      document.getElementById("home").style.display = "block";
+    }
+  </script>
+</body>
+</html>
